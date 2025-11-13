@@ -10,6 +10,7 @@ import {
 } from 'react-icons/gi';
 import { IoSparkles, IoRocket } from 'react-icons/io5';
 import ProfilePopup from './ProfilePopup';
+import user from "../assets/user.jpg"
 
 // (all your animation variants unchanged)
 const containerVariants = {
@@ -177,6 +178,7 @@ const LuckyDraw = () => {
     whatsapp: "+1 (555) 123-4567",
     email: "john.alexander@example.com",
     companyId: "COMP-789456",
+    image: user,
     age: 32,
     familyMembers: 4,
     address: "123 Main Street, Suite 400, New York, NY 10001,   ited States ",

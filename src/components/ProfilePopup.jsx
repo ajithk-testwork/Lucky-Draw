@@ -38,19 +38,20 @@ const ProfilePopup = ({ isOpen, onClose, userData, luckyNumber }) => {
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row items-center gap-6 mb-10">
               {/* Profile Image */}
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full border-4 border-blue-500 shadow-lg overflow-hidden">
-                {userData.image ? (
-                  <img
-                    src={userData.image}
-                    alt={userData.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center bg-blue-600">
-                    <FaUser className="text-white text-4xl" />
-                  </div>
-                )}
-              </div>
+            <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full border-4 border-blue-500 shadow-lg overflow-hidden bg-black">
+  {userData.image ? (
+    <img
+      src={userData.image}
+      alt={userData.name}
+      className="w-full h-full object-contain"  // <-- FULL IMAGE SHOWN
+    />
+  ) : (
+    <div className="absolute inset-0 flex items-center justify-center bg-blue-600">
+      <FaUser className="text-white text-4xl" />
+    </div>
+  )}
+</div>
+
 
               {/* Basic Info */}
               <div className="text-center sm:text-left">
