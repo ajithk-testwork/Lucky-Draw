@@ -304,8 +304,8 @@ const Dashboard = () => {
               <td className="px-8 py-6 text-center">
                 <div className="flex justify-center">
                   <div className="relative">
-                    <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl shadow-sm group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-300">
-                      <span className="text-lg font-bold text-slate-700">
+                    <div className="w-7 h-7 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl shadow-sm group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-300">
+                      <span className="text-md font-bold text-slate-700">
                         {indexOfFirstUser + index + 1}
                       </span>
                     </div>
