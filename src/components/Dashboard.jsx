@@ -34,8 +34,8 @@ const Dashboard = () => {
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.userId.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  // Pagination
+     
+  //    v vPagination
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
@@ -81,7 +81,7 @@ const Dashboard = () => {
                     <FaUsers className="text-blue-600 text-2xl" />
                   </div>
                   <div>
-                    <p className="text-blue-600 font-semibold text-lg">Total Attendees</p>
+                     <p className="text-blue-600 font-semibold text-lg">Total Attendees</p>
                     <h3 className="text-4xl font-bold text-gray-800 mt-1">{dashboardData.people}</h3>
                   </div>
                 </div>
@@ -233,7 +233,7 @@ const Dashboard = () => {
       </div>
       {/* Users Section */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-        <div className="p-6">
+        <div className="p-6 ">
           {/* Header */}
           <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
             <div className="text-center lg:text-left">
@@ -260,78 +260,131 @@ const Dashboard = () => {
           </div>
 
           {/* Table */}
-          <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    S.No
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    User Name
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    User ID
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {currentUsers.length > 0 ? (
-                  currentUsers.map((user, index) => (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors duration-150">
-                      <td className="px-4 py-4 text-center">
-                        <span className="text-sm text-gray-900 font-medium">
-                          {indexOfFirstUser + index + 1}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <span className="text-sm font-medium text-gray-900">
-                          {user.name}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {user.userId}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <div className="flex justify-center space-x-2">
-                          <button
-                            onClick={() => handlePrint(user)}
-                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                          >
-                            <FaPrint className="w-3 h-3 mr-1.5" />
-                            Print
-                          </button>
-                          <button
-                            onClick={() => handleEdit(user)}
-                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                          >
-                            <FaEdit className="w-3 h-3 mr-1.5" />
-                            Edit
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" className="px-6 py-8 text-center">
-                      <div className="flex flex-col items-center justify-center">
-                        <FaUserCircle className="text-gray-300 text-4xl mb-3" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-1">No participants found</h3>
-                        <p className="text-gray-500 text-sm">Try adjusting your search terms</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/60 overflow-hidden">
+  
 
+  <div className="overflow-x-auto">
+    <table className="w-full">
+      <thead>
+        <tr className="bg-gradient-to-r from-gray-50 to-gray-100/80 border-b border-gray-300/50">
+          <th className="px-8 py-5 text-center">
+            <div className="flex flex-col items-center space-y-1">
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">Serial No</span>
+              <div className="w-6 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+            </div>
+          </th>
+          <th className="px-8 py-5 text-center">
+            <div className="flex flex-col items-center space-y-1">
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">User Name</span>
+              <div className="w-6 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+            </div>
+          </th>
+          <th className="px-8 py-5 text-center">
+            <div className="flex flex-col items-center space-y-1">
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">User ID</span>
+              <div className="w-6 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+            </div>
+          </th>
+          <th className="px-8 py-5 text-center">
+            <div className="flex flex-col items-center space-y-1">
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">Actions</span>
+              <div className="w-6 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-200/60">
+        {currentUsers.length > 0 ? (
+          currentUsers.map((user, index) => (
+            <tr 
+              key={user.id} 
+              className="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/20 transition-all duration-200 group border-l-4 border-l-transparent hover:border-l-blue-500"
+            >
+              {/* Serial Number - Centered */}
+              <td className="px-8 py-6 text-center">
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl shadow-sm group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-300">
+                      <span className="text-lg font-bold text-slate-700">
+                        {indexOfFirstUser + index + 1}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              
+              {/* User Name - Centered */}
+              <td className="px-8 py-6 text-center">
+                <div className="flex flex-col items-center space-y-2">
+                 
+                  <div>
+                    <p className="text-base font-semibold text-gray-900">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1 font-medium">
+                      Registered User
+                    </p>
+                  </div>
+                </div>
+              </td>
+              
+              {/* User ID - Centered */}
+              <td className="px-8 py-6 text-center">
+                <div className="flex justify-center">
+                  <div className="inline-flex items-center px-4 py-2.5 rounded-2xl bg-gradient-to-r from-slate-50 to-slate-100/80 border border-slate-300/50 shadow-sm group-hover:shadow group-hover:border-blue-300/50 transition-all duration-300">
+                    <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full mr-3 shadow-sm"></div>
+                    <code className="text-sm font-mono font-bold text-slate-800 tracking-wide">
+                      {user.userId}
+                    </code>
+                  </div>
+                </div>
+              </td>
+              
+              {/* Actions - Centered */}
+              <td className="px-6 py-4 text-center">
+                <div className="flex justify-center space-x-3">
+                  <button
+                    onClick={() => handlePrint(user)}
+                    className="inline-flex items-center px-5 py-2.5 border-2 border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-400 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 transform hover:-translate-y-0.5"
+                  >
+                    <FaPrint className="w-4 h-4 mr-2.5 text-slate-500" />
+                    Print
+                  </button>
+                  <button
+                    onClick={() => handleEdit(user)}
+                    className="inline-flex items-center px-5 py-2.5 border-2 border-transparent rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:-translate-y-0.5"
+                  >
+                    <FaEdit className="w-4 h-4 mr-2.5" />
+                    Edit
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="4" className="px-8 py-20 text-center">
+              <div className="flex flex-col items-center justify-center max-w-md mx-auto">
+                <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
+                  <FaUserCircle className="text-slate-300 text-4xl" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-3">
+                  No Participants Found
+                </h3>
+                <p className="text-slate-500 text-sm leading-relaxed text-center">
+                  We couldn't find any participants matching your search criteria. 
+                  Try adjusting your search terms or check the filters.
+                </p>
+              </div>
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+
+  
+</div>
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row justify-between items-center mt-6 pt-6 border-t border-gray-200 gap-4">
