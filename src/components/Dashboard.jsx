@@ -1,4 +1,3 @@
-// Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -8,11 +7,304 @@ import {
   FaSearch,
   FaEdit,
   FaUserCircle,
-  FaEye
+  FaEye,
+  FaTimes
 } from "react-icons/fa";
 
-import ViewPopup from "./ViewPopup";
-import EditPopup from "./EditPopup";
+/* -----------------------------------------------------
+   VIEW POPUP COMPONENT (MERGED)
+----------------------------------------------------- */
+const ViewPopup = ({ user, onClose }) => {
+  if (!user) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md">
+      <div
+        className="absolute inset-0 bg-black/40 animate-opacity"
+        onClick={onClose}
+      ></div>
+
+      <div className="
+        relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl 
+        max-w-4xl w-full border border-gray-200 animate-scaleIn
+        max-h-[90vh] overflow-y-auto
+      ">
+
+        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+          <h2 className="text-2xl font-bold text-gray-800 tracking-wide">
+            Participant Details
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-red-50 text-red-600 hover:text-red-700 transition"
+          >
+            <FaTimes size={20} />
+          </button>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-8 p-8">
+          <div className="flex flex-col items-center md:items-start w-full md:w-1/3">
+            <div className="w-44 h-44 rounded-2xl overflow-hidden shadow-lg border-2 border-gray-300">
+              <img src={user.userImage} className="w-full h-full object-cover" />
+            </div>
+          </div>
+
+          <div className="flex-1">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">{user.name}</h3>
+
+            <p className="text-lg text-gray-600 mb-6">
+              Member ID:{" "}
+              <span className="font-semibold tracking-wider bg-gray-100 px-2 py-1 rounded-lg">
+                {user.userId}
+              </span>
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {[
+                ["Address", user.address],
+                ["Age", user.age],
+                ["Gender", user.gender],
+                ["Family Members", user.familyCount],
+                ["Phone", user.phone],
+                ["WhatsApp", user.whatsapp],
+                ["Email", user.email],
+                ["Food Preference", user.food],
+                ["Company ID", user.companyId],
+              ].map(([label, value], i) => (
+                <div
+                  key={i}
+                  className="p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition"
+                >
+                  <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">{label}</p>
+                  <p className="text-base font-medium text-gray-800 mt-1">{value || "N/A"}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 flex justify-end">
+              <button
+                onClick={onClose}
+                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .animate-opacity { animation: fadeIn 0.3s ease; }
+        .animate-scaleIn { animation: scaleIn 0.25s ease; }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          0% { transform: scale(0.7); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+/* -----------------------------------------------------
+   EDIT POPUP COMPONENT (MERGED)
+----------------------------------------------------- */
+const EditPopup = ({ user, onClose, onSaved }) => {
+  const [form, setForm] = useState({
+    Name: "",
+    Member_ID: "",
+    Address: "",
+    Age: "",
+    Gender: "",
+    Phone_Number: "",
+    WhatsApp_Number: "",
+    Email: "",
+    Family_Member_Count: "",
+    Company_ID: "",
+    Food: "",
+  });
+
+  const [photoFile, setPhotoFile] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    setForm({
+      Name: user.name || "",
+      Member_ID: user.userId || "",
+      Address: user.address || "",
+      Age: user.age || "",
+      Gender: user.gender || "",
+      Phone_Number: user.phone || "",
+      WhatsApp_Number: user.whatsapp || "",
+      Email: user.email || "",
+      Family_Member_Count: user.familyCount || "",
+      Company_ID: user.companyId || "",
+      Food: user.food || "",
+    });
+  }, [user]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    if (file) setPhotoFile(file);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError(null);
+
+    try {
+      let uploadedPhoto = null;
+
+      if (photoFile) {
+        const fd = new FormData();
+        fd.append("files", photoFile);
+
+        const uploadRes = await axios.post(
+          "https://api.moviemads.com/api/upload",
+          fd,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+
+        if (Array.isArray(uploadRes.data) && uploadRes.data.length > 0) {
+          uploadedPhoto = uploadRes.data[0];
+        }
+      }
+
+      const payload = {
+        Name: form.Name,
+        Member_ID: form.Member_ID,
+        Address: form.Address,
+        Age: Number(form.Age) || 0,
+        Gender: form.Gender,
+        Phone_Number: form.Phone_Number ? Number(form.Phone_Number) : null,
+        WhatsApp_Number: form.WhatsApp_Number ? Number(form.WhatsApp_Number) : null,
+        Email: form.Email,
+        Family_Member_Count: Number(form.Family_Member_Count) || 0,
+        Company_ID: form.Company_ID,
+        Food: form.Food,
+      };
+
+      if (uploadedPhoto) {
+        payload.Photo = uploadedPhoto.id;
+      }
+
+      // YOU REQUESTED TO KEEP user.userId EXACTLY
+      await axios.put(
+        `https://api.moviemads.com/api/event-forms/${user.userId}`,
+        { data: payload }
+      );
+
+      setSaving(false);
+      onSaved();
+    } catch (err) {
+      console.error("Update error:", err);
+      setSaving(false);
+      setError("Failed to update participant. Check required fields.");
+    }
+  };
+
+  if (!user) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose}></div>
+
+      <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-200 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
+          <h2 className="text-2xl font-bold text-gray-800">Edit Participant</h2>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-red-50 text-red-600">
+            <FaTimes size={20} />
+          </button>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-8 p-8">
+          <div className="w-full md:w-1/3 flex flex-col items-center">
+            <div className="w-44 h-44 rounded-xl overflow-hidden border shadow-md">
+              <img
+                src={photoFile ? URL.createObjectURL(photoFile) : user.userImage}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="mt-5 w-full">
+              <label className="text-sm font-medium text-gray-700">Change Photo</label>
+              <input type="file" accept="image/*" onChange={handleFile} className="mt-2 w-full text-sm" />
+              {photoFile && <p className="text-xs text-gray-600 mt-1">Selected: {photoFile.name}</p>}
+            </div>
+          </div>
+
+          <div className="flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                ["Name", "Name"],
+                ["Member ID", "Member_ID"],
+                ["Phone Number", "Phone_Number"],
+                ["WhatsApp Number", "WhatsApp_Number"],
+                ["Email", "Email"],
+                ["Company ID", "Company_ID"],
+                ["Age", "Age"],
+                ["Family Members", "Family_Member_Count"],
+                ["Gender", "Gender"],
+                ["Food", "Food"],
+              ].map(([label, field]) => (
+                <div key={field}>
+                  <label className="text-xs text-gray-600 font-semibold">{label}</label>
+                  <input
+                    name={field}
+                    value={form[field]}
+                    onChange={handleChange}
+                    className="w-full border px-3 py-2 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              ))}
+
+              <div className="md:col-span-2">
+                <label className="text-xs text-gray-600 font-semibold">Address</label>
+                <textarea
+                  name="Address"
+                  value={form.Address}
+                  onChange={handleChange}
+                  className="w-full border px-3 py-2 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                ></textarea>
+              </div>
+            </div>
+
+            {error && <p className="text-red-600 mt-4 text-sm">{error}</p>}
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl shadow-md hover:bg-green-700 disabled:opacity-50"
+              >
+                {saving ? "Saving..." : "Update"}
+              </button>
+
+              <button onClick={onClose} className="px-6 py-3 bg-red-600 text-white font-semibold rounded-xl shadow-sm hover:bg-red-700" disabled={saving}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// Dashboard.jsx
 
 const Dashboard = () => {
   // ----------------------------- STATES -----------------------------
@@ -130,12 +422,12 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
       {/* View & Edit Popups */}
       {viewUser && (
-        <ViewPopup user={viewUser} onClose={handleCloseView} />
+        <ViewPopup user={viewUser}  onClose={() => setViewUser(null)} />
       )}
       {editUser && (
         <EditPopup
           user={editUser}
-          onClose={handleCloseEdit}
+          onClose={() => setEditUser(null)}
           onSaved={handleAfterEdit}
         />
       )}
