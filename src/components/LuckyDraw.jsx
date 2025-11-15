@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FaPlay, FaStop, FaTrophy, FaStar, FaFire, FaUser, FaAward} from 'react-icons/fa';
+  FaPlay, FaStop, FaTrophy, FaStar, FaFire, FaUser, FaAward
+} from 'react-icons/fa';
 import {
   GiSparkles,
   GiExplosionRays,
@@ -10,9 +11,8 @@ import {
 } from 'react-icons/gi';
 import { IoSparkles, IoRocket } from 'react-icons/io5';
 import ProfilePopup from './ProfilePopup';
-import user from "../assets/user.jpg"
 
-// (all your animation variants unchanged)
+// Animation variants (unchanged)
 const containerVariants = {
   hidden: { opacity: 0, y: 100 },
   visible: { 
@@ -170,19 +170,31 @@ const LuckyDraw = () => {
   const [finalValues, setFinalValues] = useState(['B', '0', '0', '0']);
   const [blastAnimation, setBlastAnimation] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [allMembers, setAllMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Sample user data
-  const userData = {
-    name: "John Alexander",
-    phone: "+1 (555) 123-4567",
-    whatsapp: "+1 (555) 123-4567",
-    email: "john.alexander@example.com",
-    companyId: "COMP-789456",
-    image: user,
-    age: 32,
-    familyMembers: 4,
-    address: "123 Main Street, Suite 400, New York, NY 10001,   ited States ",
-    foodPreference: "Non-Vegetarian",
+  // Fetch all members data on component mount
+  useEffect(() => {
+    fetchAllMembers();
+  }, []);
+
+  const fetchAllMembers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('https://api.moviemads.com/api/event-forms');
+      const data = await response.json();
+      console.log('API Response:', data); // Debug log
+      if (data && Array.isArray(data)) {
+        setAllMembers(data);
+      } else if (data && data.data) {
+        setAllMembers(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching members:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const startSpinning = () => {
@@ -191,7 +203,9 @@ const LuckyDraw = () => {
     setResult(null);
     setBlastAnimation(false);
     setShowProfile(false);
+    setSelectedMember(null);
     
+    // Generate random number for display during spinning
     const randomNumber = Math.floor(Math.random() * 300) + 1;
     const numberStr = randomNumber.toString().padStart(3, '0');
     const newFinalValues = [
@@ -200,31 +214,59 @@ const LuckyDraw = () => {
       numberStr[1],
       numberStr[2]
     ];
-    // set final values immediately so other logic (profile) can read it
     setFinalValues(newFinalValues);
   };
 
-  const stopSpinning = () => {
+  const stopSpinning = async () => {
     setIsSpinning(false);
     setBlastAnimation(true);
     
-    const successMessages = [
-      "Amazing! You've hit the jackpot!",
-      "Incredible! Fortune favors you!",
-      "Outstanding! You're a winner!",
-      "Fantastic! Luck is on your side!",
-      "Remarkable! Victory is yours!"
-    ];
-    
-    const randomMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
-    setResult({ message: randomMessage });
+    try {
+      // Select a random member from the fetched data
+      if (allMembers.length > 0) {
+        const randomIndex = Math.floor(Math.random() * allMembers.length);
+        const winner = allMembers[randomIndex];
+        console.log('Selected Winner:', winner); // Debug log
+        setSelectedMember(winner);
+        
+        // Extract the number part from Member_ID (e.g., "B001" -> "001")
+        const memberId = winner.Member_ID || winner.attributes?.Member_ID;
+        const memberNumber = memberId ? memberId.substring(1) : '000';
+        const finalDisplayValues = [
+          'B',
+          memberNumber[0] || '0',
+          memberNumber[1] || '0',
+          memberNumber[2] || '0'
+        ];
+        setFinalValues(finalDisplayValues);
+        
+        const successMessages = [
+          "Amazing! You've hit the jackpot!",
+          "Incredible! Fortune favors you!",
+          "Outstanding! You're a winner!",
+          "Fantastic! Luck is on your side!",
+          "Remarkable! Victory is yours!"
+        ];
+        
+        const randomMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
+        setResult({ 
+          message: randomMessage,
+          memberId: memberId || "B000"
+        });
+      }
+    } catch (error) {
+      console.error('Error selecting winner:', error);
+      setResult({ 
+        message: "Congratulations! You're a winner!",
+        memberId: "B000"
+      });
+    }
     
     setTimeout(() => {
       setShowResult(true);
     }, 2500);
   };
 
-  // Reset helper (centralized)
   const resetLuckyDraw = () => {
     setIsSpinning(false);
     setResult(null);
@@ -232,20 +274,48 @@ const LuckyDraw = () => {
     setBlastAnimation(false);
     setCurrentValues(['B', '0', '0', '0']);
     setFinalValues(['B', '0', '0', '0']);
+    setSelectedMember(null);
   };
 
-  // When user clicks VIEW PROFILE: open popup first (do NOT reset)
   const handleViewProfile = () => {
     setShowProfile(true);
   };
 
-  // Close handler passed to ProfilePopup: close THEN reset after a short delay
   const closeProfile = () => {
     setShowProfile(false);
-    // Delay reset so popup has the correct number while visible
     setTimeout(() => {
       resetLuckyDraw();
-    }, 300); // 300ms is fine — adjust if you want slower/faster
+    }, 300);
+  };
+
+  // Format user data for ProfilePopup
+  const formatUserData = (member) => {
+    if (!member) return null;
+    
+    console.log('Formatting member:', member); // Debug log
+    
+    // Handle both direct properties and attributes nested structure
+    const memberData = member.attributes || member;
+    const baseUrl = 'https://api.moviemads.com';
+    
+    return {
+      name: memberData.Name || "No Name",
+      phone: memberData.Phone_Number || "Not provided",
+      whatsapp: memberData.WhatsApp_Number || "Not provided",
+      email: memberData.Email || "Not provided",
+      companyId: memberData.Company_ID || "Not provided",
+      image: memberData.Photo?.url 
+        ? `${baseUrl}${memberData.Photo.url}`
+        : memberData.Photo?.data?.attributes?.url
+        ? `${baseUrl}${memberData.Photo.data.attributes.url}`
+        : null,
+      age: memberData.Age || 0,
+      familyMembers: memberData.Family_Member_Count || 0,
+      address: memberData.Address || "Not provided",
+      foodPreference: memberData.Food || "Not specified",
+      gender: memberData.Gender || "Not specified",
+      memberId: memberData.Member_ID || "Not provided"
+    };
   };
 
   useEffect(() => {
@@ -270,12 +340,12 @@ const LuckyDraw = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 flex items-center justify-center p-4 font-serif">
-      {/* Full Screen Profile Popup */}
-       <ProfilePopup 
+      {/* Profile Popup */}
+      <ProfilePopup 
         isOpen={showProfile} 
         onClose={closeProfile} 
-        userData={userData}
-        luckyNumber={`B${finalValues.slice(1).join('')}`}
+        userData={formatUserData(selectedMember)}
+        luckyNumber={selectedMember ? (selectedMember.Member_ID || selectedMember.attributes?.Member_ID) : `B${finalValues.slice(1).join('')}`}
       />
 
       {/* Animated Background Elements */}
@@ -352,7 +422,7 @@ const LuckyDraw = () => {
               }}
             />
 
-            {/* ... rest of explosion/particles unchanged ... */}
+            {/* Blast Particles */}
             {[...Array(80)].map((_, i) => (
               <motion.div
                 key={`main-${i}`}
@@ -378,7 +448,7 @@ const LuckyDraw = () => {
               </motion.div>
             ))}
             
-            {/* other particles (unchanged) */}
+            {/* Sparkle Particles */}
             {[...Array(60)].map((_, i) => (
               <motion.div
                 key={`sparkle-${i}`}
@@ -405,6 +475,7 @@ const LuckyDraw = () => {
               </motion.div>
             ))}
 
+            {/* Rocket Particles */}
             {[...Array(20)].map((_, i) => (
               <motion.div
                 key={`rocket-${i}`}
@@ -431,6 +502,7 @@ const LuckyDraw = () => {
               </motion.div>
             ))}
 
+            {/* Floating Particles */}
             {[...Array(40)].map((_, i) => (
               <motion.div
                 key={`float-${i}`}
@@ -559,7 +631,7 @@ const LuckyDraw = () => {
             }}
             whileTap={{ scale: 0.95 }}
             onClick={startSpinning}
-            disabled={isSpinning}
+            disabled={isSpinning || loading}
             className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-2xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed border border-emerald-400 relative overflow-hidden"
           >
             <motion.div
@@ -568,7 +640,7 @@ const LuckyDraw = () => {
             >
               <FaPlay className="text-sm" />
             </motion.div>
-            START
+            {loading ? "LOADING..." : "START"}
             <motion.div
               animate={{
                 scale: [1, 1.3, 1],
@@ -589,7 +661,7 @@ const LuckyDraw = () => {
             }}
             whileTap={{ scale: 0.95 }}
             onClick={stopSpinning}
-            disabled={!isSpinning}
+            disabled={!isSpinning || allMembers.length === 0}
             className="flex-1 bg-gradient-to-r from-red-500 to-pink-600 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-2xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed border border-red-400 relative overflow-hidden"
           >
             <motion.div
@@ -660,7 +732,7 @@ const LuckyDraw = () => {
                 transition={{ delay: 0.7 }}
                 className="text-sm font-mono bg-black/30 rounded-lg py-2 px-3 mb-4"
               >
-                Lucky Number: <span className="text-yellow-300 font-bold">B{finalValues.slice(1).join('')}</span>
+                Lucky Number: <span className="text-yellow-300 font-bold">{result.memberId}</span>
               </motion.p>
               
               {/* View Profile Button */}
@@ -676,7 +748,8 @@ const LuckyDraw = () => {
                   }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleViewProfile}
-                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6 rounded-xl font-bold text-lg shadow-2xl flex items-center justify-center gap-3 border border-blue-400 relative overflow-hidden"
+                  disabled={!selectedMember}
+                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6 rounded-xl font-bold text-lg shadow-2xl flex items-center justify-center gap-3 border border-blue-400 relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FaUser className="text-sm" />
                   VIEW PROFILE
@@ -734,6 +807,11 @@ const LuckyDraw = () => {
           className="text-center text-sm text-gray-400 mt-6"
         >
           <p className="font-light">Press START to begin your lucky draw!</p>
+          {allMembers.length > 0 && (
+            <p className="text-xs mt-1 text-green-400">
+              {allMembers.length} participants loaded
+            </p>
+          )}
         </motion.div>
       </motion.div>
     </div>

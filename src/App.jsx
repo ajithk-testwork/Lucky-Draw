@@ -13,7 +13,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          {/* <Route path='/counter' element={<Counter />} /> */}
+          <Route path='/counter' element={<Counter />} />
           <Route path='/' element={<Dashboard />} />
           <Route path='/event-form' element={<EventForm />} /> 
         </Routes>

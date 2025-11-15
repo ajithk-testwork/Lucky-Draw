@@ -1,57 +1,146 @@
-import React, { useState } from 'react';
-import { FaUsers, FaUtensils, FaGift, FaSearch, FaPrint, FaEdit, FaUserCircle, FaIdCard } from 'react-icons/fa';
+// Dashboard.jsx
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  FaUsers,
+  FaUtensils,
+  FaGift,
+  FaSearch,
+  FaEdit,
+  FaUserCircle,
+  FaEye
+} from "react-icons/fa";
+
+import ViewPopup from "./ViewPopup";
+import EditPopup from "./EditPopup";
 
 const Dashboard = () => {
-  // Sample data - replace with your actual data
-  const dashboardData = {
-    people: 150,
-    food: "Food Distribution",
-    gifts: 120,
-    vegHandoverCount: 92,
-    nonVegHandoverCount: 92
-  };
+  // ----------------------------- STATES -----------------------------
+  const [users, setUsers] = useState([]);
+  const [dashboardData, setDashboardData] = useState({
+    people: 0,
+    vegHandoverCount: 0,
+    nonVegHandoverCount: 0,
+    gifts: 0
+  });
 
-  // Generate sample users data
-  const generateUsers = () => {
-    const users = [];
-    for (let i = 1; i <= 300; i++) {
-      users.push({
-        id: i,
-        name: `User ${i}`,
-        userId: `B${String(i).padStart(3, '0')}`
-      });
-    }
-    return users;
-  };
-
-  const [users] = useState(generateUsers());
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [viewUser, setViewUser] = useState(null);
+  const [editUser, setEditUser] = useState(null);
+
   const usersPerPage = 10;
 
-  // Filter users based on search term
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.userId.toLowerCase().includes(searchTerm.toLowerCase())
+  // ----------------------------- FETCH API -----------------------------
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        "https://api.moviemads.com/api/event-forms"
+      );
+
+      const data = response.data.data;
+
+      const formatted = data.map((item) => ({
+        id: item.id,
+        name: item.Name,
+        userId: item.Member_ID,
+        userImage: item.Photo?.url
+          ? `https://api.moviemads.com${item.Photo.url}`
+          : "https://via.placeholder.com/150?text=No+Image",
+        food: item.Food,
+        address: item.Address,
+        age: item.Age,
+        gender: item.Gender,
+        phone: item.Phone_Number,
+        whatsapp: item.WhatsApp_Number,
+        email: item.Email,
+        familyCount: item.Family_Member_Count,
+        companyId: item.Company_ID,
+        qrCode: item.QRCode?.url
+          ? `https://api.moviemads.com${item.QRCode.url}`
+          : null,
+        raw: item // Full API object for passing to popups
+      }));
+
+      // Stats
+      const total = formatted.length;
+      const vegCount = formatted.filter((u) =>
+        String(u.food).toLowerCase() === "veg"
+      ).length;
+      const nonvegCount = formatted.filter((u) =>
+        String(u.food).toLowerCase() === "non-veg"
+      ).length;
+
+      setUsers(formatted);
+
+      setDashboardData({
+        people: total,
+        vegHandoverCount: vegCount,
+        nonVegHandoverCount: nonvegCount,
+        gifts: 0
+      });
+    } catch (err) {
+      console.log("API Error:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // ----------------------------- FILTERS + PAGINATION -----------------------------
+  const filteredUsers = users.filter(
+    (u) =>
+      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.userId?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-     
-  //    v vPagination
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const indexOfLast = currentPage * usersPerPage;
+  const indexOfFirst = indexOfLast - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-  const handlePrint = (user) => {
-    alert(`Printing details for ${user.name} (${user.userId})`);
+  // ----------------------------- ACTION HANDLERS -----------------------------
+  const handleView = (user) => {
+    // Receive the formatted user object (with .raw)
+    setViewUser(user);
   };
 
   const handleEdit = (user) => {
-    alert(`Editing user: ${user.name} (${user.userId})`);
+    setEditUser(user);
   };
 
+  // Called by EditPopup on successful save
+  const handleAfterEdit = async () => {
+    setEditUser(null);
+    await fetchData(); // refresh table after edit
+  };
+
+  const handleCloseView = () => {
+    setViewUser(null);
+  };
+
+  const handleCloseEdit = () => {
+    setEditUser(null);
+  };
+
+  // ----------------------------- UI BELOW (UNCHANGED except actions) -----------------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
-      {/* Header Section */}
+      {/* View & Edit Popups */}
+      {viewUser && (
+        <ViewPopup user={viewUser} onClose={handleCloseView} />
+      )}
+      {editUser && (
+        <EditPopup
+          user={editUser}
+          onClose={handleCloseEdit}
+          onSaved={handleAfterEdit}
+        />
+      )}
+
+      {/* ---------------- HEADER SECTION (UNCHANGED) ---------------- */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
@@ -69,9 +158,10 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards - Horizontal Layout */}
+      {/* ---------------- STATS CARDS (LIVE DATA INSERTED) ---------------- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        {/* People Card with Circular Progress */}
+
+        {/* PEOPLE */}
         <div className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-6 shadow-2xl border border-blue-100 transform hover:scale-105 transition-all duration-300">
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -81,27 +171,19 @@ const Dashboard = () => {
                     <FaUsers className="text-blue-600 text-2xl" />
                   </div>
                   <div>
-                     <p className="text-blue-600 font-semibold text-lg">Total Attendees</p>
+                    <p className="text-blue-600 font-semibold text-lg">Total Attendees</p>
                     <h3 className="text-4xl font-bold text-gray-800 mt-1">{dashboardData.people}</h3>
                   </div>
                 </div>
 
-                {/* Circular Progress */}
+                {/* Circle Progress */}
                 <div className="relative">
                   <div className="w-20 h-20 rounded-full flex items-center justify-center">
                     <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                      <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none" stroke="#E5E7EB" strokeWidth="3" />
                       <path
-                        d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#E5E7EB"
-                        strokeWidth="3"
-                      />
-                      <path
-                        d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                         fill="none"
                         stroke="url(#blueGradient)"
                         strokeWidth="3"
@@ -132,7 +214,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Food Card with Animated Counters */}
+        {/* FOOD */}
         <div className="bg-gradient-to-br from-white to-green-50 rounded-3xl p-6 shadow-2xl border border-green-100 transform hover:scale-105 transition-all duration-300">
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -148,32 +230,37 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Food Distribution Stats */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white/80 rounded-2xl p-4 shadow-lg border border-green-200 transform hover:scale-105 transition-all duration-200">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
                       <span className="text-lg font-bold text-green-600">🥗</span>
                     </div>
-                    <p className="text-2xl font-bold text-green-600">{dashboardData.vegHandoverCount}</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {dashboardData.vegHandoverCount}
+                    </p>
                     <p className="text-xs text-green-700 font-medium mt-1">Vegetarian</p>
                   </div>
                 </div>
+
                 <div className="bg-white/80 rounded-2xl p-4 shadow-lg border border-orange-200 transform hover:scale-105 transition-all duration-200">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
                       <span className="text-lg font-bold text-orange-600">🍗</span>
                     </div>
-                    <p className="text-2xl font-bold text-orange-600">{dashboardData.nonVegHandoverCount}</p>
+                    <p className="text-2xl font-bold text-orange-600">
+                      {dashboardData.nonVegHandoverCount}
+                    </p>
                     <p className="text-xs text-orange-700 font-medium mt-1">Non-Veg</p>
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
 
-        {/* Gifts Card with Progress Bars */}
+        {/* GIFTS */}
         <div className="bg-gradient-to-br from-white to-purple-50 rounded-3xl p-6 shadow-2xl border border-purple-100 transform hover:scale-105 transition-all duration-300">
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -183,11 +270,12 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-purple-600 font-semibold text-lg">Gifts Distributed</p>
-                  <h3 className="text-4xl font-bold text-gray-800 mt-1">{dashboardData.gifts}</h3>
+                  <h3 className="text-4xl font-bold text-gray-800 mt-1">
+                    {dashboardData.gifts}
+                  </h3>
                 </div>
               </div>
 
-              {/* Gift Progress */}
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
@@ -200,7 +288,12 @@ const Dashboard = () => {
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-1000"
-                      style={{ width: `${(dashboardData.gifts / dashboardData.people) * 100}%` }}
+                      style={{
+                        width: `${dashboardData.people === 0
+                          ? 0
+                          : (dashboardData.gifts / dashboardData.people) * 100
+                        }%`
+                      }}
                     ></div>
                   </div>
                 </div>
@@ -211,12 +304,19 @@ const Dashboard = () => {
                       <div className="w-2 h-2 bg-orange-500 rounded-full mr-2"></div>
                       Pending
                     </span>
-                    <span className="text-gray-800 font-bold">{dashboardData.people - dashboardData.gifts}</span>
+                    <span className="text-gray-800 font-bold">
+                      {dashboardData.people - dashboardData.gifts}
+                    </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-gradient-to-r from-orange-400 to-orange-500 h-2 rounded-full transition-all duration-1000"
-                      style={{ width: `${((dashboardData.people - dashboardData.gifts) / dashboardData.people) * 100}%` }}
+                      style={{
+                        width: `${dashboardData.people === 0
+                          ? 0
+                          : ((dashboardData.people - dashboardData.gifts) / dashboardData.people) * 100
+                        }%`
+                      }}
                     ></div>
                   </div>
                 </div>
@@ -224,215 +324,223 @@ const Dashboard = () => {
 
               <div className="mt-4 text-center">
                 <p className="text-xs text-gray-500">
-                  Completion: {((dashboardData.gifts / dashboardData.people) * 100).toFixed(1)}%
+                  Completion: {dashboardData.people === 0
+                    ? "0%"
+                    : ((dashboardData.gifts / dashboardData.people) * 100).toFixed(1) + "%"
+                  }
                 </p>
               </div>
             </div>
           </div>
         </div>
+
       </div>
-      {/* Users Section */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-        <div className="p-6 ">
-          {/* Header */}
-          <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
-            <div className="text-center lg:text-left">
-              <h2 className="text-2xl font-bold text-gray-800">Participant Management</h2>
-              <p className="text-gray-600 mt-1">Manage and track all event participants</p>
-            </div>
 
-            {/* Search */}
-            <div className="relative mt-4 lg:mt-0">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaSearch className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search participants..."
-                className="pl-10 pr-4 py-2.5 w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </div>
-          </div>
+      {/* ---------------- USERS TABLE (UPDATED TABLE HEADERS) ---------------- */}
+     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+  <div className="p-8">
 
-          {/* Table */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200/60 overflow-hidden">
-  
+    {/* Header Section */}
+    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+      <div className="mb-6 lg:mb-0">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          Participant Management
+        </h2>
+        <p className="text-gray-500 mt-2 text-lg">Manage and track all event participants in real-time</p>
+      </div>
 
-  <div className="overflow-x-auto">
-    <table className="w-full">
-      <thead>
-        <tr className="bg-gradient-to-r from-gray-50 to-gray-100/80 border-b border-gray-300/50">
-          <th className="px-8 py-5 text-center">
-            <div className="flex flex-col items-center space-y-1">
-              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">Serial No</span>
-              <div className="w-6 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
-            </div>
-          </th>
-          <th className="px-8 py-5 text-center">
-            <div className="flex flex-col items-center space-y-1">
-              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">User Name</span>
-              <div className="w-6 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
-            </div>
-          </th>
-          <th className="px-8 py-5 text-center">
-            <div className="flex flex-col items-center space-y-1">
-              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">User ID</span>
-              <div className="w-6 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
-            </div>
-          </th>
-          <th className="px-8 py-5 text-center">
-            <div className="flex flex-col items-center space-y-1">
-              <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">Actions</span>
-              <div className="w-6 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
-            </div>
-          </th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-200/60">
-        {currentUsers.length > 0 ? (
-          currentUsers.map((user, index) => (
-            <tr 
-              key={user.id} 
-              className="hover:bg-gradient-to-r hover:from-blue-50/30 hover:to-indigo-50/20 transition-all duration-200 group border-l-4 border-l-transparent hover:border-l-blue-500"
-            >
-              {/* Serial Number - Centered */}
-              <td className="px-8 py-6 text-center">
-                <div className="flex justify-center">
-                  <div className="relative">
-                    <div className="w-7 h-7 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl shadow-sm group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-300">
-                      <span className="text-md font-bold text-slate-700">
-                        {indexOfFirstUser + index + 1}
-                      </span>
+      {/* Search Bar */}
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <FaSearch className="text-gray-400 text-lg" />
+        </div>
+        <input
+          type="text"
+          placeholder="Search by name or member ID..."
+          className="pl-12 pr-6 py-3.5 w-96 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all duration-200 text-lg"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
+      </div>
+    </div>
+
+    {/* Table Container */}
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-200">
+              <th className="px-8 py-6 text-left">
+                <span className="text-base font-semibold text-gray-700 uppercase tracking-wider">S.No</span>
+              </th>
+              <th className="px-8 py-6 text-left">
+                <span className="text-base font-semibold text-gray-700 uppercase tracking-wider">User Details</span>
+              </th>
+              <th className="px-8 py-6 text-left">
+                <span className="text-base font-semibold text-gray-700 uppercase tracking-wider">Member ID</span>
+              </th>
+              <th className="px-8 py-6 text-center">
+                <span className="text-base font-semibold text-gray-700 uppercase tracking-wider">Actions</span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-gray-100">
+            {currentUsers.length > 0 ? (
+              currentUsers.map((user, index) => (
+                <tr 
+                  key={user.id} 
+                  className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/30 transition-all duration-200 group"
+                >
+                  
+                  {/* Serial Number */}
+                  <td className="px-8 py-6">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-semibold text-white">
+                          {indexOfFirst + index + 1}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </td>
-              
-              {/* User Name - Centered */}
-              <td className="px-8 py-6 text-center">
-                <div className="flex flex-col items-center space-y-2">
-                 
-                  <div>
-                    <p className="text-base font-semibold text-gray-900">
-                      {user.name}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1 font-medium">
-                      Registered User
-                    </p>
-                  </div>
-                </div>
-              </td>
-              
-              {/* User ID - Centered */}
-              <td className="px-8 py-6 text-center">
-                <div className="flex justify-center">
-                  <div className="inline-flex items-center px-4 py-2.5 rounded-2xl bg-gradient-to-r from-slate-50 to-slate-100/80 border border-slate-300/50 shadow-sm group-hover:shadow group-hover:border-blue-300/50 transition-all duration-300">
-                    <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full mr-3 shadow-sm"></div>
-                    <code className="text-sm font-mono font-bold text-slate-800 tracking-wide">
+                  </td>
+
+                  {/* User Details */}
+                  <td className="px-8 py-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center shadow-inner">
+                        <span className='w-8 h-8 rounded-full'>
+                          <img src={user.userImage} alt={user.name} className="w-8 h-8 rounded-full object-cover"/>
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-gray-900 mb-1">{user.name}</p>
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Registered
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Member ID */}
+                  <td className="px-8 py-6">
+                    <code className="text-base font-mono font-bold bg-gray-50 px-4 py-2 rounded-lg border border-gray-200 text-gray-800">
                       {user.userId}
                     </code>
-                  </div>
-                </div>
-              </td>
-              
-              {/* Actions - Centered */}
-              <td className="px-6 py-4 text-center">
-                <div className="flex justify-center space-x-3">
-                  <button
-                    onClick={() => handlePrint(user)}
-                    className="inline-flex items-center px-5 py-2.5 border-2 border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-400 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 transform hover:-translate-y-0.5"
-                  >
-                    <FaPrint className="w-4 h-4 mr-2.5 text-slate-500" />
-                    Print
-                  </button>
-                  <button
-                    onClick={() => handleEdit(user)}
-                    className="inline-flex items-center px-5 py-2.5 border-2 border-transparent rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:-translate-y-0.5"
-                  >
-                    <FaEdit className="w-4 h-4 mr-2.5" />
-                    Edit
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="4" className="px-8 py-20 text-center">
-              <div className="flex flex-col items-center justify-center max-w-md mx-auto">
-                <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
-                  <FaUserCircle className="text-slate-300 text-4xl" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-800 mb-3">
-                  No Participants Found
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed text-center">
-                  We couldn't find any participants matching your search criteria. 
-                  Try adjusting your search terms or check the filters.
-                </p>
-              </div>
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
+                  </td>
 
-  
-</div>
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-6 pt-6 border-t border-gray-200 gap-4">
-              <div className="text-sm text-gray-700 text-center sm:text-left">
-                Showing <span className="font-medium">{indexOfFirstUser + 1}</span> to{" "}
-                <span className="font-medium">{Math.min(indexOfLastUser, filteredUsers.length)}</span> of{" "}
-                <span className="font-medium">{filteredUsers.length}</span> results
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Previous
-                </button>
-
-                <div className="flex items-center space-x-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const pageNumber = i + 1;
-                    return (
+                  {/* Actions */}
+                  <td className="px-8 py-6">
+                    <div className="flex justify-center space-x-3">
+                      {/* VIEW */}
                       <button
-                        key={pageNumber}
-                        onClick={() => setCurrentPage(pageNumber)}
-                        className={`inline-flex items-center justify-center w-8 h-8 text-sm font-medium rounded-md transition-colors ${currentPage === pageNumber
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-600 hover:bg-gray-100'
-                          }`}
+                        onClick={() => handleView(user)}
+                        className="inline-flex items-center px-4 py-3 border-2 border-gray-300 rounded-xl text-base font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
+                        title="View"
                       >
-                        {pageNumber}
+                        <FaEye className="w-5 h-5 mr-2 text-gray-500" />
+                        View
                       </button>
-                    );
-                  })}
-                </div>
 
+                      {/* EDIT */}
+                      <button
+                        onClick={() => handleEdit(user)}
+                        className="inline-flex items-center px-6 py-3 border-2 border-transparent rounded-xl text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <FaEdit className="w-5 h-5 mr-3" />
+                        Edit
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="px-8 py-20 text-center">
+                  <div className="flex flex-col items-center justify-center max-w-md mx-auto">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                      <FaUserCircle className="text-gray-400 text-5xl" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                      No Participants Found
+                    </h3>
+                    <p className="text-gray-500 text-lg mb-6">
+                      No users matched your search criteria.
+                    </p>
+                    <button 
+                      onClick={() => setSearchTerm('')}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors duration-200"
+                    >
+                      Clear Search
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {/* Pagination - Modern Style */}
+    {totalPages > 1 && (
+      <div className="flex flex-col sm:flex-row justify-between items-center mt-8 pt-6 border-t border-gray-200 space-y-4 sm:space-y-0">
+        <div className="text-gray-600 text-lg">
+          Showing <span className="font-semibold text-gray-900">{indexOfFirst + 1}-{Math.min(indexOfLast, filteredUsers.length)}</span> of <span className="font-semibold text-gray-900">{filteredUsers.length}</span> participants
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setCurrentPage(c => Math.max(c - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-5 py-2.5 border-2 border-gray-300 rounded-xl text-base font-semibold text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Previous
+          </button>
+
+          <div className="flex items-center space-x-1">
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const page = currentPage <= 3 ? i + 1 : 
+                         currentPage >= totalPages - 2 ? totalPages - 4 + i : 
+                         currentPage - 2 + i;
+              return (
                 <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-12 h-12 rounded-xl text-base font-semibold transition-all duration-200 ${
+                    currentPage === page
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
                 >
-                  Next
+                  {page}
                 </button>
-              </div>
-            </div>
-          )}
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(c => Math.min(c + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-5 py-2.5 border-2 border-gray-300 rounded-xl text-base font-semibold text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center"
+          >
+            Next
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
+    )}
+
+  </div>
+</div>
+
     </div>
   );
 };

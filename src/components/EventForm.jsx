@@ -2,7 +2,8 @@ import axios from "axios";
 import React, { useState } from "react";
 
 export default function EventForm() {
-  const [form, setForm] = useState({
+
+   const defaultForm = {
     Name: "",
     Address: "",
     Age: "",
@@ -13,7 +14,9 @@ export default function EventForm() {
     Email: "",
     Family_Member_Count: "",
     Food: "",
-  });
+  };
+
+  const [form, setForm] = useState(defaultForm);
 
   const [photo, setPhoto] = useState(null);
 
@@ -35,6 +38,7 @@ export default function EventForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
 
     try {
       let photoId = null;
@@ -57,6 +61,8 @@ export default function EventForm() {
 
       console.log("SUCCESS:", response.data);
       alert("Form submitted successfully!");
+        setForm(defaultForm);
+      setPhoto(null);
     } catch (error) {
       console.error("ERROR:", error.response?.data || error);
       alert("Failed to submit form");
@@ -96,6 +102,7 @@ export default function EventForm() {
                     </label>
                     <input
                       name="Name"
+                      value={form.Name}
                       onChange={handleChange}
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                       placeholder="Enter your full name"
@@ -109,6 +116,7 @@ export default function EventForm() {
                     </label>
                     <input
                       name="Age"
+                      value={form.Age}
                       onChange={handleChange}
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                       placeholder="Enter your age"
@@ -127,6 +135,7 @@ export default function EventForm() {
                       <select
                         name="Gender"
                         onChange={handleChange}
+                        value={form.Gender}
                         className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 appearance-none bg-white cursor-pointer"
                         required
                       >
@@ -149,6 +158,7 @@ export default function EventForm() {
                     </label>
                     <input
                       name="Company_ID"
+                      value={form.Company_ID}
                       onChange={handleChange}
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                       placeholder="Enter company ID"
@@ -175,6 +185,7 @@ export default function EventForm() {
                     </label>
                     <input
                       name="Phone_Number"
+                      value={form.Phone_Number}
                       onChange={handleChange}
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                       placeholder="Enter phone number"
@@ -189,6 +200,7 @@ export default function EventForm() {
                     </label>
                     <input
                       name="WhatsApp_Number"
+                      value={form.WhatsApp_Number}
                       onChange={handleChange}
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                       placeholder="Enter WhatsApp number"
@@ -203,6 +215,7 @@ export default function EventForm() {
                   </label>
                   <input
                     name="Email"
+                    value={form.Email}
                     onChange={handleChange}
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                     placeholder="Enter email address"
@@ -217,6 +230,7 @@ export default function EventForm() {
                   </label>
                   <input
                     name="Address"
+                    value={form.Address}
                     onChange={handleChange}
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                     placeholder="Enter your complete address"
@@ -242,6 +256,7 @@ export default function EventForm() {
                   </label>
                   <input
                     name="Family_Member_Count"
+                    value={form.Family_Member_Count}
                     onChange={handleChange}
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                     placeholder="Number of family members"
@@ -257,6 +272,7 @@ export default function EventForm() {
                     <select
                       name="Food"
                       onChange={handleChange}
+                      value={form.Food}
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 appearance-none bg-white cursor-pointer"
                     >
                       <option value="">Select Food Preference</option>
