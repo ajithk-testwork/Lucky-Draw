@@ -352,7 +352,9 @@ const Dashboard = () => {
         qrCode: item.QRCode?.url
           ? `https://api.moviemads.com${item.QRCode.url}`
           : null,
-        raw: item // Full API object for passing to popups
+        raw: item,
+        giftReceived: item.IsGiftReceived,
+         // Full API object for passing to popups
       }));
 
       // Stats
@@ -365,12 +367,13 @@ const Dashboard = () => {
       ).length;
 
       setUsers(formatted);
+      const giftCount = formatted.filter((u) => u.giftReceived === true).length;
 
       setDashboardData({
         people: total,
         vegHandoverCount: vegCount,
         nonVegHandoverCount: nonvegCount,
-        gifts: 0
+        gifts: giftCount
       });
     } catch (err) {
       console.log("API Error:", err);
@@ -409,13 +412,15 @@ const Dashboard = () => {
     await fetchData(); // refresh table after edit
   };
 
-  const handleCloseView = () => {
-    setViewUser(null);
-  };
+  
 
-  const handleCloseEdit = () => {
-    setEditUser(null);
-  };
+  // const handleCloseView = () => {
+  //   setViewUser(null);
+  // };
+
+  // const handleCloseEdit = () => {
+  //   setEditUser(null);
+  // };
 
   // ----------------------------- UI BELOW (UNCHANGED except actions) -----------------------------
   return (
