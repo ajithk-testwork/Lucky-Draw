@@ -8,9 +8,7 @@ import {
   Twitter, 
   Instagram, 
   Linkedin,
-  Heart,
-  Calendar,
-  Users
+  Heart
 } from 'lucide-react';
 import Logo from "../assets/Logo.png";
 import { useNavigate } from "react-router-dom";
@@ -54,49 +52,46 @@ const Footer = () => {
       name: 'Facebook',
       icon: Facebook,
       href: '#',
-      color: 'hover:bg-blue-100 hover:text-blue-600'
+      gradient: 'hover:from-blue-600 hover:to-cyan-600'
     },
     {
       name: 'Twitter',
       icon: Twitter,
       href: '#',
-      color: 'hover:bg-sky-100 hover:text-sky-500'
+      gradient: 'hover:from-purple-600 hover:to-pink-600'
     },
     {
       name: 'Instagram',
       icon: Instagram,
       href: '#',
-      color: 'hover:bg-pink-100 hover:text-pink-600'
+      gradient: 'hover:from-green-600 hover:to-emerald-600'
     },
     {
       name: 'LinkedIn',
       icon: Linkedin,
       href: '#',
-      color: 'hover:bg-blue-100 hover:text-blue-700'
+      gradient: 'hover:from-blue-600 hover:to-purple-600'
     }
   ];
 
   const contactInfo = [
     {
       icon: MapPin,
-      text: '123 Event Street, San Francisco, CA 94105'
+      text: '123 Event Street, San Francisco, CA 94105',
+      gradient: 'hover:text-green-600'
     },
     {
       icon: Phone,
       text: '+1 (555) 123-4567',
-      href: 'tel:+15551234567'
+      href: 'tel:+15551234567',
+      gradient: 'hover:text-blue-600'
     },
     {
       icon: Mail,
       text: 'hello@regeve.com',
-      href: 'mailto:hello@regeve.com'
+      href: 'mailto:hello@regeve.com',
+      gradient: 'hover:text-purple-600'
     }
-  ];
-
-  const stats = [
-    { number: '1000+', label: 'Events Managed', icon: Calendar },
-    { number: '50K+', label: 'Participants', icon: Users },
-    { number: '8', label: 'Cities', icon: MapPin }
   ];
 
   const containerVariants = {
@@ -125,63 +120,78 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-white border-t border-gray-200">
-   
-
+    <footer className="bg-white/80 backdrop-blur-md border-t border-gray-200">
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 text-center lg:text-left"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
         >
-          {/* Brand Section */}
-          <motion.div variants={itemVariants} className="space-y-4">
-            <div className="flex items-center space-x-2">
+          {/* Brand Section - Takes 2 columns */}
+          <motion.div 
+            variants={itemVariants} 
+            className="lg:col-span-2 space-y-6"
+          >
+            <div 
+              className="flex items-center justify-center lg:justify-start space-x-3 cursor-pointer"
+              onClick={() => navigate("/")}
+            >
               <img
                 src={Logo}
                 alt="Regeve Logo"
                 className="w-16 h-12"
               />
-              <span className="text-xl font-bold text-gray-900">Regeve</span>
+              <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                REGEVE
+              </span>
             </div>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-gray-700 text-sm leading-relaxed max-w-md mx-auto lg:mx-0">
               Creating unforgettable event experiences with seamless registration, 
               interactive lucky draws, and smart food management solutions.
             </p>
             
             {/* Contact Info */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {contactInfo.map((item, index) => (
-                <a
+                <motion.a
                   key={index}
                   href={item.href}
-                  className="flex items-center space-x-3 text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm"
+                  className={`flex items-start space-x-3 text-gray-600 transition-colors duration-200 text-sm group justify-center lg:justify-start ${item.gradient}`}
+                  whileHover={{ x: 5 }}
                 >
-                  <item.icon className="w-4 h-4 text-gray-400" />
-                  <span>{item.text}</span>
-                </a>
+                  <item.icon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform duration-200" />
+                  <span className="leading-tight">{item.text}</span>
+                </motion.a>
               ))}
             </div>
           </motion.div>
 
-          {/* Links Sections */}
-          {Object.entries(footerLinks).map(([key, section]) => (
-            <motion.div key={key} variants={itemVariants}>
-              <h4 className="font-semibold text-gray-900 mb-4">
+          {/* Links Sections - Each takes 1 column */}
+          {Object.entries(footerLinks).map(([key, section], sectionIndex) => (
+            <motion.div 
+              key={key} 
+              variants={itemVariants}
+              className="lg:col-span-1"
+            >
+              <h4 className="font-semibold text-gray-800 mb-6 text-lg relative inline-block">
                 {section.title}
+                <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600 group-hover:w-full transition-all duration-300"></div>
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {section.links.map((link, index) => (
                   <li key={index}>
-                    <button
+                    <motion.button
                       onClick={() => handleNavigation(link.path)}
-                      className="text-gray-600 hover:text-blue-600 transition-colors duration-200 text-sm text-left hover:underline cursor-pointer"
+                      className="text-gray-600 hover:text-purple-600 transition-colors duration-200 text-sm  cursor-pointer w-full text-start relative group"
+                      whileHover={{ x: 5 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {link.name}
-                    </button>
+                      <span>{link.name}</span>
+                      <div className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-purple-600 to-pink-600 group-hover:w-full transition-all duration-300"></div>
+                    </motion.button>
                   </li>
                 ))}
               </ul>
@@ -191,15 +201,22 @@ const Footer = () => {
 
         {/* Bottom Section */}
         <motion.div
-          className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          className="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
           viewport={{ once: true }}
         >
           {/* Copyright */}
-          <div className="text-gray-500 text-sm flex items-center">
-            © {currentYear} Regeve. Made with <Heart className="w-4 h-4 mx-1 text-red-500" /> for amazing event experiences.
+          <div className="text-gray-600 text-sm flex items-center justify-center md:justify-start">
+            © {currentYear} Regeve. Made with{' '}
+            <motion.div
+              whileHover={{ scale: 1.2 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <Heart className="w-4 h-4 mx-1 text-red-500 fill-current" />
+            </motion.div>
+            {' '}for amazing event experiences.
           </div>
 
           {/* Social Links */}
@@ -208,9 +225,14 @@ const Footer = () => {
               <motion.a
                 key={social.name}
                 href={social.href}
-                className={`w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 transition-all duration-200 ${social.color}`}
-                whileHover={{ scale: 1.1, y: -2 }}
+                className={`w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 transition-all duration-200 border border-gray-200 hover:shadow-lg hover:scale-110 ${social.gradient} hover:text-white`}
+                whileHover={{ 
+                  scale: 1.1, 
+                  y: -2,
+                  background: `linear-gradient(135deg, var(--tw-gradient-from), var(--tw-gradient-to))`
+                }}
                 whileTap={{ scale: 0.95 }}
+                aria-label={social.name}
               >
                 <social.icon className="w-4 h-4" />
               </motion.a>
@@ -218,8 +240,6 @@ const Footer = () => {
           </div>
         </motion.div>
       </div>
-
-      
     </footer>
   );
 };

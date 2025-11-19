@@ -28,7 +28,6 @@ const Navbar = () => {
 
   const navigate = useNavigate();
 
-
   const navItems = [
     { name: 'Home', path: "/" },
     { name: 'About Us', path: "/about" },
@@ -68,47 +67,46 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 bg-white backdrop-blur-md border-b border-gray-200 z-40">
+      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <motion.div
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 cursor-pointer"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
+              onClick={() => navigate("/")}
             >
               <div className="relative">
-                {/* Logo Image */}
-                <img
-                  src={Logo}     // <-- add your imported image here
-                  alt="Regeve Logo"
-                  className="w-20 h-15 "
-                />
-
-
+                {/* Logo with gradient text */}
+                <div className="flex items-center space-x-2">
+                  <img
+                    src={Logo}
+                    alt="Regeve Logo"
+                    className="w-20 h-15"
+                  />
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    REGEVE
+                  </span>
+                </div>
               </div>
-
-             
             </motion.div>
-
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {navItems.map((item, index) => (
-                <motion.a
+                <motion.button
                   key={item.name}
-                  href={item.href}
                   onClick={() => navigate(item.path)}
-                  className="flex items-center space-x-1 cursor-pointer text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium group"
+                  className="relative flex items-center space-x-1 cursor-pointer text-gray-700 hover:text-blue-600  transition-colors duration-200 font-medium group"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  {item.icon}
                   <span>{item.name}</span>
-                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></div>
-                </motion.a>
+                  
+                </motion.button>
               ))}
             </div>
 
@@ -126,7 +124,7 @@ const Navbar = () => {
               </motion.button>
               <motion.button
                 onClick={openRegister}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-cyan-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
@@ -140,7 +138,7 @@ const Navbar = () => {
 
             {/* Mobile Menu Button */}
             <motion.button
-              className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+              className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600 hover:text-white transition-all duration-200"
               onClick={toggleMenu}
               whileTap={{ scale: 0.95 }}
             >
@@ -160,17 +158,18 @@ const Navbar = () => {
               >
                 <div className="py-4 space-y-4">
                   {navItems.map((item, index) => (
-                    <motion.a
+                    <motion.button
                       key={item.name}
-                      href={item.href}
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors duration-200 font-medium"
+                      onClick={() => {
+                        navigate(item.path);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white rounded-lg transition-all duration-200 font-medium text-left"
                       variants={itemVariants}
                       transition={{ delay: index * 0.1 }}
-                      onClick={() => setIsMenuOpen(false)}
                     >
-                      {item.icon}
                       <span>{item.name}</span>
-                    </motion.a>
+                    </motion.button>
                   ))}
 
                   <div className="border-t border-gray-200 pt-4 px-4 space-y-3">
@@ -179,7 +178,7 @@ const Navbar = () => {
                         openLogin();
                         setIsMenuOpen(false);
                       }}
-                      className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium"
+                      className="w-full flex items-center justify-center space-x-2 px-4 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-cyan-600 hover:text-white hover:border-transparent transition-all duration-200 font-medium"
                       variants={itemVariants}
                       transition={{ delay: 0.3 }}
                     >
@@ -191,7 +190,7 @@ const Navbar = () => {
                         openRegister();
                         setIsMenuOpen(false);
                       }}
-                      className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
+                      className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium shadow-lg"
                       variants={itemVariants}
                       transition={{ delay: 0.4 }}
                     >

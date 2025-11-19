@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Calendar, Star, ArrowRight } from 'lucide-react';
+import { MapPin, Calendar, Star, Users } from 'lucide-react';
 
 import img1 from "../assets/OurReach/chennai.webp"
 import img2 from "../assets/OurReach/Hyderabad.webp"
@@ -51,7 +51,7 @@ const OurReach = () => {
                     </div>
 
                     <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                        Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Reach</span>
+                        Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 ">Reach</span>
                     </h2>
 
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -90,33 +90,35 @@ const OurReach = () => {
                     ))}
                 </div>
 
-                {/* STATS */}
+                {/* STATS - Vertical Layout */}
                 <motion.div
-                    className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
+                    className="flex flex-col md:flex-row gap-8 mt-16"
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
                     viewport={{ once: true }}
                 >
                     {[
-                        { number: '1150+', label: 'Total Events', icon: Calendar },
+                        { number: '1,150+', label: 'Total Events', icon: Calendar },
                         { number: '8', label: 'Cities', icon: MapPin },
-                        { number: '4.8', label: 'Avg Rating', icon: Star },
-                        { number: '50K+', label: 'Happy Clients', icon: '👥' }
+                        { number: '4.8', label: 'Average Rating', icon: Star },
+                        { number: '50,000+', label: 'Happy Clients', icon: Users }
                     ].map((stat) => (
                         <motion.div
                             key={stat.label}
-                            className="text-center p-3 bg-white rounded-2xl shadow-lg border border-gray-200"
-                            whileHover={{ y: -5, scale: 1.02 }}
+                            className="flex-1 bg-gradient-to-br from-blue-50 to-white p-6 border-l-4 border-blue-500 rounded-r-lg"
+                            whileHover={{ x: 5 }}
                             transition={{ type: "spring", stiffness: 300 }}
                         >
-                            {typeof stat.icon === 'string' ? (
-                                <div className="text-2xl mb-2">{stat.icon}</div>
-                            ) : (
-                                <stat.icon className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-                            )}
-                            <div className="text-2xl font-bold text-gray-900 mb-1">{stat.number}</div>
-                            <div className="text-gray-600 font-medium">{stat.label}</div>
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white rounded-lg shadow-sm">
+                                    <stat.icon className="w-6 h-6 text-blue-600" />
+                                </div>
+                                <div className="text-left">
+                                    <div className="text-2xl font-bold text-gray-900">{stat.number}</div>
+                                    <div className="text-gray-600 text-sm">{stat.label}</div>
+                                </div>
+                            </div>
                         </motion.div>
                     ))}
                 </motion.div>

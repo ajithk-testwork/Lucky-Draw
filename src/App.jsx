@@ -9,6 +9,7 @@ import Home from './page/Home';
 import About from './page/About';
 import Contact from './page/Contact';
 import Footer from './components/Footer';
+import VotingPage from './Voting/VotingPage';
  
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path='/counter' element={<Counter />} />
           <Route path='/dashboard' element={<Dashboard />} />
           <Route path='/event-form' element={<EventForm />} /> 
+          <Route path='voting-system' element={<VotingPage />} />
         </Routes>
         <Footer/>
     </>

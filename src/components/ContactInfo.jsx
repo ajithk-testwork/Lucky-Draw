@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Calendar, Clock, Send, User, MessageCircle } from 'lucide-react';
-import Map from "../assets/map.webp"
+import Map from "../assets/india-map.jpg"
 import ContactBg from "../assets/ContactBg2.jpg"
 
 const ContactInfo = () => {
@@ -117,7 +117,7 @@ const ContactInfo = () => {
                         {/* Header */}
                         <motion.div variants={itemVariants} className="mb-8">
                             <h1 className="text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-                                Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Touch</span>
+                                Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600">Touch</span>
                             </h1>
                             <p className="text-2xl text-gray-300 mb-2">Masters of Connection</p>
                             <p className="text-xl text-blue-300 font-semibold">Let's Work Together</p>
@@ -132,7 +132,7 @@ const ContactInfo = () => {
                                 <div>
                                     <p className="text-gray-400 text-sm">Email</p>
                                     <a href="mailto:info@bilimbedigital.com" className="text-white text-lg font-semibold hover:text-blue-300 transition-colors">
-                                        info@bilimbedigital.com
+                                        hello@regeve.com
                                     </a>
                                 </div>
                             </div>
@@ -349,7 +349,7 @@ const ContactInfo = () => {
                             {/* Submit Button */}
                             <motion.button
                                 type="submit"
-                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
+                                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >

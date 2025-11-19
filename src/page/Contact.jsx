@@ -153,7 +153,7 @@ const Contact = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Get In Touch
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-6"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-cyan-600  mx-auto mb-6"></div>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Have questions about our events? We're here to help and would love to hear from you.
           </p>
@@ -175,7 +175,7 @@ const Contact = () => {
             </motion.h3>
 
             <motion.div
-              className="grid gap-6 mb-8"
+              className="grid gap-10.5 mb-8"
               variants={containerVariants}
             >
               {contactInfo.map((info, index) => (
@@ -210,7 +210,7 @@ const Contact = () => {
 
             {/* Quick Support */}
             <motion.div
-              className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-6 text-white"
+              className="bg-gradient-to-r from-blue-600 to-cyan-600  rounded-2xl p-6 text-white"
               variants={itemVariants}
             >
               <div className="flex items-center mb-4">
@@ -322,7 +322,7 @@ const Contact = () => {
                 <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-4 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 py-4 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                   whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                 >

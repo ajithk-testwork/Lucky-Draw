@@ -180,7 +180,7 @@ const FAQSection = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Frequently Asked Questions
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-6"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-cyan-600 mx-auto mb-6"></div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Get answers to all your questions about our event management platform and features.
           </p>
@@ -202,7 +202,7 @@ const FAQSection = () => {
                 onClick={() => setActiveCategory(category.id)}
                 className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 border ${
                   activeCategory === category.id
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg border-transparent'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-white shadow-lg border-transparent'
                     : 'bg-white text-gray-700 hover:text-gray-900 border-gray-300 hover:border-gray-400 hover:shadow-md'
                 }`}
                 whileHover={{ scale: 1.05 }}
@@ -243,7 +243,7 @@ const FAQSection = () => {
                     whileTap="tap"
                   >
                     <div className="flex items-start gap-4 flex-1">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
                         <faq.icon className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1 text-left">

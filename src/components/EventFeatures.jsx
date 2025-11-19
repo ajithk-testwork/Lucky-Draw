@@ -149,7 +149,7 @@ const EventFeatures = () => {
                 </motion.div>
 
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                    Event <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Features</span>
+                    Event <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-600 ">Features</span>
                 </h1>
                 <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                     Comprehensive event management solutions designed to streamline your operations and enhance attendee experiences.

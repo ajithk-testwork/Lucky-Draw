@@ -97,7 +97,7 @@ const AboutEvent = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             About The Event
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-6"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-cyan-600  mx-auto mb-6"></div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Discover what makes our event the must-attend technology gathering of the year
           </p>
@@ -204,7 +204,7 @@ const AboutEvent = () => {
                 variants={cardVariants}
                 whileHover="hover"
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                   <highlight.icon className="w-8 h-8 text-white" />
                 </div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-3">
@@ -220,7 +220,7 @@ const AboutEvent = () => {
 
         {/* Additional Info */}
         <motion.div
-          className="mt-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-8 text-white"
+          className="mt-16 bg-gradient-to-r bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-2xl p-8 text-white"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -254,7 +254,7 @@ const AboutEvent = () => {
           viewport={{ once: true }}
         >
           <motion.button
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
